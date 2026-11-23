@@ -1,8 +1,7 @@
-# 🛡️ Laboratorio Blue Team: Wazuh + Sysmon + Atomic Red Team
+# 🛡️ Laboratorio Blue Team: Wazuh + Sysmon + Atomic Red Team (MITRE ATT&CK)
 
-Laboratorio de **Detection Engineering** en el que se simulan seis técnicas de MITRE ATT&CK contra un endpoint Windows monitorizado con Wazuh. Se evalúa qué detecta Wazuh de serie, se identifican huecos de cobertura y se desarrollan reglas propias cuando resulta adecuado.
+Laboratorio de **detection engineering**: 6 técnicas de MITRE ATT&CK simuladas contra un endpoint Windows monitorizado con Wazuh, comprobando qué detecta de serie, qué huecos tiene y qué reglas propias los cierran.
 
-> El objetivo no es solo desplegar un SIEM: es validar detecciones con pruebas controladas, analizar resultados y documentar tanto los aciertos como las limitaciones.
 
 ## 📌 Objetivos
 
@@ -19,7 +18,7 @@ Laboratorio de **Detection Engineering** en el que se simulan seis técnicas de 
 | Wazuh 4.14.10 (OVA) | SIEM: manager, indexer y dashboard |
 | Sysmon | Telemetría de Windows, configuración de SwiftOnSecurity |
 | Atomic Red Team | Simulación de técnicas MITRE ATT&CK |
-| Hydra | Pruebas controladas de fuerza bruta RDP desde Kali Linux |
+| Hydra (Kali Linux) | Pruebas controladas de fuerza bruta RDP desde Kali Linux |
 | VirtualBox | Virtualización del laboratorio |
 
 ## 🧩 Arquitectura
@@ -113,6 +112,7 @@ Desde **Endpoints Summary → Deploy new agent**, seleccionar Windows MSI, intro
   <log_format>eventchannel</log_format>
 </localfile>
 ```
+
 
 ### 4. Atomic Red Team
 
@@ -263,10 +263,8 @@ El principal matiz fue la severidad: las alertas eran de nivel 5, bajo para una 
 |---|---|---|
 | Instalación manual de Wazuh fallaba (`No space left on device`) | Espacio insuficiente | Utilizar la OVA oficial |
 | Agente instalado parcialmente, sin `ossec.conf` | Instalación dañada | Desinstalar con `Uninstall-Package` y reinstalar |
-| `NET START WazuhSvc` fallaba por `log_format` inválido | Errata `eventchanel` | Corregir a `eventchannel` |
 | Atomic Red Team bloqueado (`ScriptContainedMaliciousContent`) | AMSI analiza el script | Preparar el entorno de pruebas aislado y revisar la configuración de protección |
 | Dashboard sin eventos recientes | Reloj de Windows desincronizado unas 2 horas | `w32tm /resync /force` tras restaurar snapshots |
-| Regla propia no disparaba pese a validar | Espacio en regex y campo incorrecto (`win.event.image` en vez de `win.eventdata.image`) | Validar y probar contra eventos reales |
 
 ## ✅ Conclusiones
 
@@ -274,22 +272,6 @@ El principal matiz fue la severidad: las alertas eran de nivel 5, bajo para una 
 - La detección más robusta fue el borrado de logs, basado en eventos generados por Windows y no en una herramienta concreta.
 - No todos los huecos justifican una regla propia: documentar el riesgo de falsos positivos también es una decisión válida de Detection Engineering.
 - Detectar no basta: la etiqueta MITRE debe reflejar la técnica y el nivel de alerta debe ser coherente con su gravedad.
-
-## 🔧 Próximos pasos
-
-1. Afinar las reglas `100100` y `100102` con actividad legítima para evaluar falsos positivos.
-2. Investigar una correlación más precisa para los ciclos 2 y 5, con umbrales, ventanas y posibles listas blancas.
-3. Crear una regla de persistencia para el ciclo 3 que correlacione creación y ejecución de tareas.
-4. Revisar el nivel de las reglas `63103` y `63104` del ciclo 6.
-5. Ampliar el laboratorio con técnicas de movimiento lateral y exfiltración, o repetir los ciclos con otros procesos padre.
-
-## 🛠️ Herramientas
-
-- Wazuh — SIEM y correlación de eventos
-- Sysmon — Telemetría de Windows
-- Atomic Red Team — Simulación de técnicas MITRE ATT&CK
-- Hydra — Pruebas controladas de fuerza bruta
-- VirtualBox — Virtualización
 
 ---
 
