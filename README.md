@@ -92,7 +92,7 @@ sudo systemctl start wazuh-manager
 sudo systemctl start filebeat
 sudo systemctl start wazuh-dashboard
 ```
-
+(Laboratorio-Blue-Team-Wazuh-Sysmon-Atomic-Red-Team-MITRE-ATT-CK-/evidence/wazuh.png)
 ### 2. Sysmon en Windows
 
 Descargar la configuración de SwiftOnSecurity:
@@ -112,7 +112,7 @@ Desde **Endpoints Summary → Deploy new agent**, seleccionar Windows MSI, intro
   <log_format>eventchannel</log_format>
 </localfile>
 ```
-
+<img src="evidence/wazuh.png">
 
 ### 4. Atomic Red Team
 
@@ -174,21 +174,7 @@ sudo /var/ossec/bin/wazuh-analysisd -t
 sudo systemctl restart wazuh-manager
 ```
 
-## 📊 Dashboard de Wazuh
-
-Filtro para los eventos del endpoint:
-
-```text
-agent.name: "WIN10-LAB"
-```
-
-Filtro para las reglas propias:
-
-```text
-rule.id: (100100 or 100102)
-```
-
-### Métricas del laboratorio
+## 📊 Métricas del laboratorio
 
 | Métrica | Resultado |
 |---|---:|
@@ -196,6 +182,8 @@ rule.id: (100100 or 100102)
 | Alertas de nivel 12 o superior | 617 |
 | Autenticaciones fallidas (ciclo 2) | 36 |
 | Autenticaciones exitosas | 13 |
+
+<img src="/evidence/Dashboards.png">
 
 ## 🧪 Resultados por técnica MITRE ATT&CK
 
@@ -219,11 +207,18 @@ rule.id: (100100 or 100102)
 
 ### Ciclo 1 — PowerShell con Base64 (T1059.001)
 
-La regla de serie `92057` exige un proceso padre `powershell.exe` y una lista limitada de abreviaturas. Con `-ENC` o con el comando lanzado desde `cmd.exe`, solo se generaban alertas de nivel 3–4.
+<img src="/evidence/ciclo1-powershell-encoded/01-atomic-test-success.png">
+
+<img src="/evidence/ciclo1-powershell-encoded/02-deteccion-serie-insuficiente.png">
+
+La regla exige que el proceso padre sea `powershell.exe` y que el commandLine contenga el parámetro en una lista cerrada de abreviaturas que no incluye `enc`. Por eso se le escapaba `-ENC` y cualquier lanzamiento con un padre distinto de PowerShell.
 
 La regla `100100` amplía la cobertura a las abreviaturas probadas, sin depender del proceso padre, y exige un bloque Base64 para reducir confusiones con `-ExecutionPolicy`. Se validó con ocho combinaciones (cuatro abreviaturas y dos procesos padre) y un control negativo.
 
+<img src="/evidence/ciclo1-powershell-encoded/03-regla-100100-detecta.png">
+
 **Hallazgo colateral:** el lanzamiento de PowerShell también generaba la alerta `92213` (nivel 15), asociada al archivo `__PSScriptPolicyTest_*.ps1` que PowerShell crea al arrancar. Se observó como posible falso positivo de alta severidad.
+
 
 ### Ciclo 2 — Fuerza bruta RDP (T1110.001)
 
