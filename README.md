@@ -92,7 +92,7 @@ sudo systemctl start wazuh-manager
 sudo systemctl start filebeat
 sudo systemctl start wazuh-dashboard
 ```
-(Laboratorio-Blue-Team-Wazuh-Sysmon-Atomic-Red-Team-MITRE-ATT-CK-/evidence/wazuh.png)
+
 ### 2. Sysmon en Windows
 
 Descargar la configuración de SwiftOnSecurity:
