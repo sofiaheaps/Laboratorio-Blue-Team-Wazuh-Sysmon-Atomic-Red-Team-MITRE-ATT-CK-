@@ -1,3 +1,7 @@
+<p align="center">
+<img src="evidence/portada-soc.png" width="900">
+</p>
+
 # 🛡️ Laboratorio Blue Team: Wazuh + Sysmon + Atomic Red Team (MITRE ATT&CK)
 
 Laboratorio de **detection engineering**: 6 técnicas de MITRE ATT&CK simuladas contra un endpoint Windows monitorizado con Wazuh, comprobando qué detecta de serie, qué huecos tiene y qué reglas propias los cierran.
@@ -52,7 +56,7 @@ Todas las VMs disponen además de un adaptador NAT para salida a Internet y desc
 |---|---|---|---|---|
 | `wazuh-ova` | SIEM | Amazon Linux 2023 (OVA de Wazuh) | 4 CPU, 8 GB RAM, 50 GB disco | Wazuh 4.14.10 |
 | Windows 10 | Víctima | Windows 10 | 2 CPU, 4 GB RAM | Agente Wazuh, Sysmon, Atomic Red Team |
-| Kali Linux | Atacante | Kali Linux | 2 CPU, 4 GB RAM | Hydra |
+| Kali Linux | Atacante | 64-bit v.2023.3 | 2 CPU, 4 GB RAM | Hydra |
 
 ## 📁 Estructura del repositorio
 
