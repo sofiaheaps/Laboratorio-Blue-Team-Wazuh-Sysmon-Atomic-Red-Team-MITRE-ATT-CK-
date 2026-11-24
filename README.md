@@ -59,18 +59,14 @@ Todas las VMs disponen además de un adaptador NAT para salida a Internet y desc
 ```text
 wazuh-attack-simulation-lab/
 ├── README.md
-├── rules/
-│   └── local_rules.xml
 ├── evidence/
-│   ├── ciclo1-powershell-encoded/
-│   ├── ciclo2-rdp-bruteforce/
-│   ├── ciclo3-scheduled-task/
-│   ├── ciclo4-registry-run-key/
-│   ├── ciclo5-local-account/
-│   └── ciclo6-log-clearing/
-└── docs/
-    ├── arquitectura.png
-    └── dashboard-overview.png
+    ├── ciclo1-powershell-encoded/
+    ├── ciclo2-rdp-bruteforce/
+    ├── ciclo3-scheduled-task/
+    ├── ciclo4-registry-run-key/
+    ├── ciclo5-local-account/
+    └── ciclo6-log-clearing/
+
 ```
 
 ## 🛠️ Instalación y configuración
@@ -272,6 +268,7 @@ El principal matiz fue la severidad: las alertas eran de nivel 5, bajo para una 
 | Agente instalado parcialmente, sin `ossec.conf` | Instalación dañada | Desinstalar con `Uninstall-Package` y reinstalar |
 | Atomic Red Team bloqueado (`ScriptContainedMaliciousContent`) | AMSI analiza el script | Preparar el entorno de pruebas aislado y revisar la configuración de protección |
 | Dashboard sin eventos recientes | Reloj de Windows desincronizado unas 2 horas | `w32tm /resync /force` tras restaurar snapshots |
+| Tras apagar o reiniciar la VM, los comandos de Atomic Red Team no están disponibles hasta volver a importar el módulo | La importación del módulo solo queda cargada en la sesión actual de PowerShell y no persiste al cerrar la sesión o apagar la máquina | Antes de lanzar cada prueba después de iniciar la VM, ejecutar `Import-Module "C:\AtomicRedTeam\invoke-atomicredteam\Invoke-AtomicRedTeam.psd1" -Force`
 
 ## ✅ Conclusiones
 
