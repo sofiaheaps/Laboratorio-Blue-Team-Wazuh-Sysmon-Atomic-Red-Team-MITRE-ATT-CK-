@@ -55,8 +55,8 @@ Todas las VMs disponen además de un adaptador NAT para salida a Internet y desc
 | VM | Rol | Sistema operativo | Recursos | Software |
 |---|---|---|---|---|
 | `wazuh-ova` | SIEM | Amazon Linux 2023 (OVA de Wazuh) | 4 CPU, 8 GB RAM, 50 GB disco | Wazuh 4.14.10 |
-| Windows 10 | Víctima | Windows 10 | 2 CPU, 4 GB RAM | Agente Wazuh, Sysmon, Atomic Red Team |
-| Kali Linux | Atacante | 64-bit v.2023.3 | 2 CPU, 4 GB RAM | Hydra |
+| `Windows 10` | Víctima / Atacante | Windows 10 | 2 CPU, 4 GB RAM | Agente Wazuh, Sysmon, Atomic Red Team |
+| `Kali Linux` | Atacante | 64-bit v.2023.3 | 2 CPU, 4 GB RAM | Hydra |
 
 ## 📁 Estructura del repositorio
 
