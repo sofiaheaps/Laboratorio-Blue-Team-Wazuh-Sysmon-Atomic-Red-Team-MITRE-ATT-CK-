@@ -174,17 +174,6 @@ sudo /var/ossec/bin/wazuh-analysisd -t
 sudo systemctl restart wazuh-manager
 ```
 
-## 📊 Métricas del laboratorio
-
-| Métrica | Resultado |
-|---|---:|
-| Alertas totales generadas | 8.752 |
-| Alertas de nivel 12 o superior | 617 |
-| Autenticaciones fallidas (ciclo 2) | 36 |
-| Autenticaciones exitosas | 13 |
-
-<img src="/evidence/Dashboards.png">
-
 ## 🧪 Resultados por técnica MITRE ATT&CK
 
 | Ciclo | Técnica | Prueba | Detección de serie | Regla propia | Resultado |
@@ -207,7 +196,7 @@ sudo systemctl restart wazuh-manager
 
 ### Ciclo 1 — PowerShell con Base64 (T1059.001)
 
-<img src="/evidence/ciclo1-powershell-encoded/01-atomic-test-success.png">
+<img src="/evidence/ciclo1-powershell-encoded/01-atomic-test-success.png" width="800">
 
 <img src="/evidence/ciclo1-powershell-encoded/02-deteccion-serie-insuficiente.png">
 
@@ -222,7 +211,13 @@ La regla `100100` amplía la cobertura a las abreviaturas probadas, sin depender
 
 ### Ciclo 2 — Fuerza bruta RDP (T1110.001)
 
-La regla `60204` correlaciona ocho fallos (`60122`) desde una misma IP en una ventana de 240 segundos. Con Hydra a máxima velocidad, 12 intentos dispararon la correlación al octavo fallo. Con 45 segundos entre intentos (`hydra -t 1 -W 45`), los fallos se distribuyeron durante unos nueve minutos y no se alcanzó el umbral.
+<img src="evidence/ciclo2-rdp-bruteforce/01-hydra-ataque-rapido.png" width="650">
+
+La regla `60204` correlaciona ocho fallos (`60122`) desde una misma IP en una ventana de 240 segundos. Con Hydra a máxima velocidad, 12 intentos dispararon la correlación al octavo fallo. 
+<img src="evidence/ciclo2-rdp-bruteforce/02-wazuh-correlacion-60204.png">
+
+Con 45 segundos entre intentos (`hydra -t 1 -W 45`), los fallos se distribuyeron durante unos nueve minutos y no se alcanzó el umbral.
+<img src="evidence/ciclo2-rdp-bruteforce/03-wazuh-ataque-lento-sin-correlacion.png">
 
 No se implementó regla propia porque ampliar la ventana y reducir el umbral puede aumentar los falsos positivos.
 
@@ -230,13 +225,23 @@ No se implementó regla propia porque ampliar la ventana y reducir el umbral pue
 
 La creación (`schtasks /create`) y la ejecución posterior generaron alertas, pero no se etiquetaron como `T1053.005`. La ejecución se detectó mediante la regla genérica `92052` (“cmd lanzado por un proceso anormal”), etiquetada como `T1059.003`.
 
+<img src="evidence/ciclo3-scheduled-task/task.png">
+
 El hallazgo fue de contexto y clasificación: la alerta indicaba un proceso sospechoso, pero no la persistencia mediante tarea programada. No se implementó regla propia porque sería necesario correlacionar la creación y ejecución en el tiempo.
 
 ### Ciclo 4 — Clave Run del registro (T1547.001)
 
-Wazuh dispone de reglas específicas (`92300–92303`), pero la cobertura observada correspondía a `reg.exe` (regla `92302`). La escritura equivalente mediante PowerShell (`New-ItemProperty`) no generaba una alerta visible de nivel relevante, aunque Sysmon identificaba el patrón como `T1060,RunKey`.
+Wazuh dispone de reglas específicas (`92300–92303`), pero la cobertura observada correspondía a `reg.exe` (regla `92302`). 
+
+<img src="evidence/ciclo4-registry-run-key/01-regexe-deteccion-92302.png">
+
+La escritura equivalente mediante PowerShell (`New-ItemProperty`) no generaba una alerta visible de nivel relevante, aunque Sysmon identificaba el patrón como `T1060,RunKey`.
+
+<img src="evidence/ciclo4-registry-run-key/02-powershell-evento-sysmon.png">
 
 La regla `100102` amplía la detección a modificaciones realizadas mediante PowerShell.
+
+<img src="evidence/ciclo4-registry-run-key/03-regla-100102-detecta.png">
 
 ### Ciclo 5 — Creación de cuenta local (T1136.001)
 
@@ -244,11 +249,19 @@ Se probaron `net user` y `New-LocalUser`. Sysmon detectó con precisión `net us
 
 La auditoría nativa de Windows (eventos `4720`, `4722` y `4738`; reglas `60109–60110`) detectó ambas vías, aunque con una etiqueta genérica `T1098`.
 
+<img src="evidence/ciclo5-local-account/01-net-user-deteccion-92040.png">
+
+<img src="evidence/ciclo5-local-account/02-new-localuser-deteccion.png">
+
 **Conclusión:** la creación de la cuenta no pasó completamente inadvertida, pero con PowerShell se perdió el detalle de la herramienta utilizada.
 
 ### Ciclo 6 — Borrado de logs (T1070.001)
 
 Las reglas `63103` (registro de Seguridad, evento `1102`) y `63104` (otros registros, evento `104`) detectaron la limpieza sin depender del proceso. Se probó contra el registro de Seguridad y el de Sysmon; ambos generaron alerta.
+
+<img src="evidence/ciclo6-log-clearing/01-security-log-evento-1102.png">
+
+<img src="evidence/ciclo6-log-clearing/02-sysmon-log-evento-104.png">
 
 El principal matiz fue la severidad: las alertas eran de nivel 5, bajo para una actividad potencialmente importante durante un ataque.
 
@@ -256,7 +269,6 @@ El principal matiz fue la severidad: las alertas eran de nivel 5, bajo para una 
 
 | Problema | Causa | Solución aplicada |
 |---|---|---|
-| Instalación manual de Wazuh fallaba (`No space left on device`) | Espacio insuficiente | Utilizar la OVA oficial |
 | Agente instalado parcialmente, sin `ossec.conf` | Instalación dañada | Desinstalar con `Uninstall-Package` y reinstalar |
 | Atomic Red Team bloqueado (`ScriptContainedMaliciousContent`) | AMSI analiza el script | Preparar el entorno de pruebas aislado y revisar la configuración de protección |
 | Dashboard sin eventos recientes | Reloj de Windows desincronizado unas 2 horas | `w32tm /resync /force` tras restaurar snapshots |
