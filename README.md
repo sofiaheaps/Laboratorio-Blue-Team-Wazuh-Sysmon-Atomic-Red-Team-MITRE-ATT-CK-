@@ -10,7 +10,7 @@ Laboratorio de **detection engineering**: 6 técnicas de MITRE ATT&CK simuladas 
 ## 📌 Objetivos
 
 - Desplegar un entorno aislado de monitorización.
-- Simular técnicas de ataque con Atomic Red Team y Hydra.
+- Simular ataques mediante Atomic Red Team, Hydra y herramientas nativas de Windows (PowerShell, CMD y schtasks), entre otras.
 - Evaluar la cobertura de las reglas de Wazuh.
 - Crear y validar reglas locales para cubrir detecciones incompletas.
 - Documentar falsos positivos, huecos y oportunidades de mejora.
